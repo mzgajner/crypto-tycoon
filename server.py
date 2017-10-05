@@ -102,15 +102,18 @@ def get_bank_options(i, j):
   ]
 
 def visit_bank(cords, person):
-  i, j = cords
+  i, j = map(int, cords)
   bank_options = get_bank_options(i, j)
   if not bank_options:
     return False
   if not 0.5 * (random.random() * (person["steps"]/10.0)) > 0.4:
     return False
   rnd = random.randint(0, len(bank_options) - 1)
-  bank_owner = world[i][j]["content"]["player_id"]
-  players[player_id] += person["money"]
+  i1, j1 = map(int, bank_options[rnd])
+  print i1,j1
+  print world[i1][j1]
+  bank_owner = world[i1][j1]["content"][0]["player_id"]
+  players[bank_owner] += person["money"]
   return True
 
 
@@ -195,8 +198,9 @@ def build(json):
     return
   if money >= players[player_id]:
     players[player_id] -= 200
-  world[i][j]["content"] = create_bank(player_id)
+  world[i][j]["content"] = [create_bank(player_id)]
   # return new money state
   print "new money:", players[player_id]
+  update()
   return players[player_id]
   

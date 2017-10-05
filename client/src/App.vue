@@ -13,7 +13,7 @@
                 >
                     <template v-for="object in column.content">
                         <div v-if="object.type === 'person'" class="person"></div>
-                        <div v-else-if="object.type === 'house'" class="house"></div>
+                        <div v-else-if="object.type === 'building'" class="building"></div>
                     </template>
                 </div>
             </div>
@@ -92,7 +92,7 @@ export default {
             background-color: green;
         }
         &.road {
-            background-color: grey;
+            background-color: lightblue;
         }
     }
 
@@ -110,5 +110,15 @@ export default {
         width: 20px;
         background-color: black;
         position: absolute;
+        transition: all 0.5s linear;
     }
+    .building {
+        left: 10px;
+        top: 10px;
+        height: 20px;
+        width: 20px;
+        background-color: brown;
+        position: absolute;
+    }
+
 </style>
