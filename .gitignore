@@ -10,3 +10,10 @@ yarn-error.log
 *.ntvs*
 *.njsproj
 *.sln
+*.pyc
+pip-selfcheck.json
+bin
+include
+lib
+local
+share
