@@ -49,15 +49,12 @@ LAND = create_land
 ROAD = create_road
 
 def build_road(n):
-  rv = []
-  for i in range(n):
-    rv.append(ROAD())
-  return rv
+  return [ROAD() for _ in range(n)]
 
 def build_road_block(n):
+  """How to lose a job"""
   rv = []
-  for _ in range(n):
-    rv.extend([ROAD(), LAND(), LAND()])
+  [rv.extend([ROAD(), LAND(), LAND()]) for _ in range(n)]
   return rv
 
 def append_mid(world):
