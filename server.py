@@ -34,13 +34,15 @@ def create_person():
     "type": "person",
     "prev": None,
     "money": random.randint(50, 100),
-    "steps": 0
+    "steps": 0,
+    "id": random.randint(1,1000000)
   }
 
 def create_bank(player_id):
   return {
     "type": "building",
-    "player_id": player_id
+    "player_id": player_id,
+    "currency": player_curs[player_id]
   }
 
 LAND = create_land
@@ -179,13 +181,15 @@ def update():
     broadcast=True
   )
 
-
+player_curs = {}
+curs = ['btc', 'etc']
 # socket handlers
 @socketio.on('register')
 def register(player_data):
   print player_data
   players[player_data["id"]] = start_money
-  if len(players) > 0:
+  player_curs[player_data["id"]] = curs.pop()
+  if len(players) == 2:
     Ticker(1).run()
 
 @socketio.on('build')
