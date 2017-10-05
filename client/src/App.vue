@@ -11,9 +11,9 @@
                     :class="'column ' + column.type"
                     @click="build(column, row_index, column_index)"
                 >
-                    <template v-if="column.content">
-                        <div v-if="column.content.type === 'person'" class="person"></div>
-                        <div v-else-if="column.content.type === 'house'" class="house"></div>
+                    <template v-for="object in column.content">
+                        <div v-if="object.type === 'person'" class="person"></div>
+                        <div v-else-if="object.type === 'house'" class="house"></div>
                     </template>
                 </div>
             </div>
@@ -40,6 +40,17 @@ export default {
     computed: {
         wrapperClass() {
             return this.building ? 'is-building' : '';
+        },
+        cellsWithContent() {
+            let cellsWithContents = [];
+            this.grid.forEach(row => {
+                row.forEach(column => {
+                    if(column.content) {
+                        cellsWithContents.push(column);
+                    }
+                })
+            })
+            return cellsWithContents;
         }
     },
     methods: {
@@ -76,6 +87,7 @@ export default {
     .column {
         width:40px;
         height:40px;
+        position: relative;
         &.land {
             background-color: green;
         }
@@ -90,4 +102,13 @@ export default {
         }
     }
 
+    .person {
+        left: 10px;
+        top: 10px;
+        border-radius: 50px;
+        height: 20px;
+        width: 20px;
+        background-color: black;
+        position: absolute;
+    }
 </style>
