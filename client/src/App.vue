@@ -47,10 +47,13 @@ export default {
             this.building = true;
         },
         build(column, x, y) {
+            debugger;
             if (column.type !== 'land') return;
             this.building = false;
             server.emit('build', {
-                position: [x, y]
+                position: [x, y],
+                money: this.money,
+                player_id: this.id
             });
         }
     },

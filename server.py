@@ -36,6 +36,12 @@ def create_person():
     "money": random.randint(50, 100)
   }
 
+def create_bank(player_id):
+  return {
+    "type": "building",
+    "player_id": player_id
+  }
+
 LAND = create_land
 ROAD = create_road
 
@@ -59,7 +65,7 @@ world.extend([
 ])
 print world
 
-players = []
+players = {}
 start_money = 1000
 directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 apply_moves = collections.defaultdict(list)
@@ -122,18 +128,13 @@ class Ticker(threading.Thread):
       time.sleep(self.secs)
       self.do_tick()
 
-def get_player_money():
-  return {
-    player["id"]: player["money"]
-    for player in players
-  }
 
 def update():
   emit(
     'update',
     {
       'world': world,
-      'money': get_player_money()
+      'money': players
     },
     broadcast=True
   )
@@ -142,10 +143,23 @@ def update():
 # socket handlers
 @socketio.on('register')
 def register(player_data):
-    print player_data
-    players.append({
-      'id': player_data['id'],
-      'money': start_money
-    })
-    if len(players) > 0:
-      Ticker(1).run()
+  print player_data
+  players[player_data["id"]] = start_money
+  if len(players) > 0:
+    Ticker(1).run()
+
+@socketio.on('build')
+def build(json):
+  print "noter"
+  i, j = json["position"]
+  money = json["money"]
+  player_id = json["player_id"]
+  if not is_type(i,j,"land") or world[i][j]["content"] is not None:
+    return
+  if money >= players[player_id]:
+    players[player_id] -= 200
+  world[i][j]["content"] = create_bank(player_id)
+  # return new money state
+  print "new money:", players[player_id]
+  return players[player_id]
+  
