@@ -1,21 +1,10 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div id="app" v-if="grid.length>0">
+   <div class="row" v-for="row in grid">
+     <div  v-for="column in row" :class="'column' + ' ' + column.type">
+
+     </div>
+   </div>
   </div>
 </template>
 
@@ -24,37 +13,37 @@ export default {
   name: 'app',
   data () {
     return {
-      msg: 'Welcome to Your crypto tycoon App'
+      grid: []
+    }
+  },
+  created () {
+    for(var r=0; r<18; r++) {
+        for(var c=0; c<27; c++) {
+            if(!this.grid[r]) {
+                this.grid[r] = [];
+            }
+            this.grid[r][c] = {
+                type: r%3==1 || c%3==1 ? 'road' : 'land'
+            }
+        }
     }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  .row {
+    display:flex;
+  }
+  .column {
+    width:40px;
+    height:40px;
+    &.land {
+      background-color: darkgreen;
+    }
+    &.road {
+      background-color: dimgrey;
+    }
+  }
 
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 </style>
