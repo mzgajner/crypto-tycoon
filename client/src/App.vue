@@ -25,7 +25,7 @@
 import io from 'socket.io-client'
 
 const server = io.connect('http://localhost:5000');
-server.emit('register',{ id: Math.floor(Math.random() * 64) });
+
 
 export default {
     name: 'app',
@@ -34,6 +34,7 @@ export default {
             grid: [],
             building: false,
             money: 0,
+            id: null,
         }
     },
     computed: {
@@ -54,10 +55,12 @@ export default {
         }
     },
     created() {
-        server.on('start', (payload) => {
+        this.id = Math.floor(Math.random() * 64);
+        server.emit('register',{ id: this.id });
+        server.on('update', (payload) => {
             console.log('start occured', payload);
             this.grid = payload.world;
-            this.money = payload.start_money;
+            this.money = payload.money[this.id];
         });
     },
 }

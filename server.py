@@ -1,3 +1,4 @@
+import time
 import random
 import threading
 import collections
@@ -31,8 +32,8 @@ def create_road(people=None):
 def create_person():
   return {
     "type": "person",
-    "prev": None
-    "money": random.ranint(50, 100)
+    "prev": None,
+    "money": random.randint(50, 100)
   }
 
 LAND = create_land
@@ -80,7 +81,7 @@ def move_person(i, j, person):
   step_options = get_next_step_options(i, j, prev)
   if not step_options:
     return
-  rnd = random.randint(0, len(step_options))
+  rnd = random.randint(0, len(step_options) - 1)
   chosen_step = step_options[rnd]
   person["prev"] = (i, j)
   apply_moves[chosen_step].append(person)
@@ -95,7 +96,7 @@ def move_people():
       if field["type"] == "road":
         for person in field["content"]:
           move_person(i, j, person)
-        field["content"] = None
+        field["content"] = []
   apply_people_moves()
 
 def generate_people():
@@ -110,26 +111,29 @@ class Ticker(threading.Thread):
   def __init__(self, secs):
     self.secs = secs
 
-  def do_tick():
+  def do_tick(self):
     move_people()
     generate_people()
+    update()
+    # TODO emit event
   
   def run(self):
     while True:
       time.sleep(self.secs)
       self.do_tick()
-      
 
-def ticker():
-  move_people()
-  generate_people()
+def get_player_money():
+  return {
+    player["id"]: player["money"]
+    for player in players
+  }
 
-def start():
+def update():
   emit(
-    'start',
+    'update',
     {
       'world': world,
-      'start_money': start_money
+      'money': get_player_money()
     },
     broadcast=True
   )
@@ -140,7 +144,8 @@ def start():
 def register(player_data):
     print player_data
     players.append({
-      'id': player_data['id']
+      'id': player_data['id'],
+      'money': start_money
     })
     if len(players) > 0:
-      start()
+      Ticker(1).run()
