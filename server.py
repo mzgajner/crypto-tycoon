@@ -45,23 +45,34 @@ def create_bank(player_id):
 LAND = create_land
 ROAD = create_road
 
+def build_road(n):
+  rv = []
+  for i in range(n):
+    rv.append(ROAD())
+  return rv
+
+def build_road_block(n):
+  rv = []
+  for _ in range(n):
+    rv.extend([ROAD(), LAND(), LAND()])
+  return rv
 
 def append_mid(world):
   world.extend([
-    [ROAD()] * 27,
-    [LAND()] + [ROAD(), LAND(), LAND()] * 8 + [ROAD(), LAND()],
-    [LAND()] + [ROAD(), LAND(), LAND()] * 8 + [ROAD(), LAND()],
+    build_road(27),
+    [LAND()] + build_road_block(8) + [ROAD(), LAND()],
+    [LAND()] + build_road_block(8) + [ROAD(), LAND()],
   ])
 
 world = [
   # first
-  [LAND()] + [ROAD(), LAND(), LAND()] * 8 + [ROAD(), LAND()],
+  [LAND()] + build_road_block(8) + [ROAD(), LAND()],
 ]
 for i in range(5):
   append_mid(world)
 world.extend([
-  [ROAD()] * 27,
-  [LAND()] + [ROAD(), LAND(), LAND()] * 8 + [ROAD(), LAND()]
+  build_road(27),
+  [LAND()] + build_road_block(8) + [ROAD(), LAND()]
 ])
 print world
 
@@ -97,20 +108,25 @@ def apply_people_moves():
     world[i][j]["content"] = people
 
 def move_people():
+  apply_moves.clear()
   for i, row in enumerate(world):
     for j, field in enumerate(row):
       if field["type"] == "road":
         for person in field["content"]:
           move_person(i, j, person)
         field["content"] = []
+  
+  print apply_moves
   apply_people_moves()
 
 def generate_people():
-  N = 3
-  for j, field in enumerate(world[0]):
-    if is_type(0, j, "road"):
-      if random.random() > 0.3:
-        world[0][j]["content"].append(create_person())
+  def generate_for_row(row):
+    for j, field in enumerate(row):
+      if is_type(0, j, "road"):
+        if random.random() < 0.1:
+          row[j]["content"].append(create_person())
+  generate_for_row(world[0])
+  generate_for_row(world[len(world) -1])
 
 class Ticker(threading.Thread):
 
@@ -121,7 +137,6 @@ class Ticker(threading.Thread):
     move_people()
     generate_people()
     update()
-    # TODO emit event
   
   def run(self):
     while True:
