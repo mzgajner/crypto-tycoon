@@ -63,10 +63,11 @@ def start():
 
 
 # socket handlers
-@socketio.on('connect')
-def handle_my_custom_event(player_data):
+@socketio.on('register')
+def register(player_data):
+    print player_data
     players.append({
       'id': player_data['id']
     })
-    if len(players) == 1:
+    if len(players) > 0:
       start()
