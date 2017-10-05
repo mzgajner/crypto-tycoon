@@ -33,7 +33,8 @@ def create_person():
   return {
     "type": "person",
     "prev": None,
-    "money": random.randint(50, 100)
+    "money": random.randint(50, 100),
+    "steps": 0
   }
 
 def create_bank(player_id):
@@ -93,6 +94,26 @@ def get_next_step_options(i, j, prev):
     if is_type(i+dir_i, j+dir_j, "road") and not (i+dir_i, j+dir_j) == prev
   ]
   
+def get_bank_options(i, j):
+  return [
+    (i + dir_i, j + dir_j)
+    for dir_i, dir_j in directions
+    if is_type(i+dir_i, j+dir_j, "land") and world[i+dir_i][j+dir_j]["content"]
+  ]
+
+def visit_bank(cords, person):
+  i, j = cords
+  bank_options = get_bank_options(i, j)
+  if not bank_options:
+    return False
+  if not 0.5 * (random.random() * (person["steps"]/10.0)) > 0.4:
+    return False
+  rnd = random.randint(0, len(bank_options) - 1)
+  bank_owner = world[i][j]["content"]["player_id"]
+  players[player_id] += person["money"]
+  return True
+
+
 def move_person(i, j, person):
   prev = person["prev"]
   step_options = get_next_step_options(i, j, prev)
@@ -101,7 +122,9 @@ def move_person(i, j, person):
   rnd = random.randint(0, len(step_options) - 1)
   chosen_step = step_options[rnd]
   person["prev"] = (i, j)
-  apply_moves[chosen_step].append(person)
+  person["steps"] += 1
+  if not visit_bank(chosen_step, person):
+    apply_moves[chosen_step].append(person)
 
 def apply_people_moves():
   for (i,j), people in apply_moves.items():
@@ -115,8 +138,7 @@ def move_people():
         for person in field["content"]:
           move_person(i, j, person)
         field["content"] = []
-  
-  print apply_moves
+  # print apply_moves
   apply_people_moves()
 
 def generate_people():

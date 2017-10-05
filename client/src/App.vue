@@ -24,7 +24,7 @@
 <script>
 import io from 'socket.io-client'
 
-const server = io.connect('http://localhost:5000');
+let server = io.connect('http://localhost:5000');
 
 
 export default {
@@ -58,10 +58,10 @@ export default {
             this.building = true;
         },
         build(column, x, y) {
-            debugger;
             if (column.type !== 'land') return;
             this.building = false;
-            server.emit('build', {
+            let bla = io.connect('http://localhost:5000');
+            bla.emit('build', {
                 position: [x, y],
                 money: this.money,
                 player_id: this.id
